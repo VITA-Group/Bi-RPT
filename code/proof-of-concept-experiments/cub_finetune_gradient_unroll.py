@@ -12,7 +12,7 @@ import torch
 import torch.optim
 import torch.nn as nn
 import torch.utils.data
-import torch.nn.functional as F
+
 #import torchvision.models as models
 from models.resnet import resnet18, MaskedConv2d
 import torch.multiprocessing as mp
@@ -22,28 +22,9 @@ import torchvision.datasets as datasets
 from utils import *
 from gradient_unroll import train_with_imagenet_unroll
 from utils import test_with_imagenet
-from pruning_utils import check_sparsity,extract_mask,prune_model_custom
+from pruning_utils import extract_mask, prune_model_custom
 import copy
 import torch.nn.utils.prune as prune
-
-
-def pruning_model(model, px=0.2):
-
-    print('start unstructured pruning for all conv layers')
-    parameters_to_prune =[]
-    for name, m in model.named_modules():
-        if isinstance(m, nn.Conv2d):
-            parameters_to_prune.append((m,'weight'))
-
-
-
-    parameters_to_prune = tuple(parameters_to_prune)
-
-    prune.global_unstructured(
-        parameters_to_prune,
-        pruning_method=prune.L1Unstructured,
-        amount=px,
-    )
 
 parser = argparse.ArgumentParser(description='PyTorch Iterative Pruning')
 
@@ -118,25 +99,13 @@ def main():
     if args.seed:
         setup_seed(args.seed)
 
-    #args.gpu = gpu
-
     if args.gpu is not None:
         print("Use GPU: {} for training".format(args.gpu))
 
     args.distributed = True
     args.multiprocessing_distributed=True
 
-    # ngpus_per_node = torch.cuda.device_count()
-    if False:
-        # Since we have ngpus_per_node processes per node, the total world_size
-        # needs to be adjusted accordingly
-        args.world_size = ngpus_per_node * args.world_size
-        # Use torch.multiprocessing.spawn to launch distributed processes: the
-        # main_worker process function
-        mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
-    else:
-        # Simply call main_worker function
-        main_worker(args.gpu, 1, args)
+    main_worker(args.gpu, 1, args)
 
 def main_worker(gpu, ngpus_per_node, args):
     global best_acc1
