@@ -6,6 +6,9 @@
 conda env create -f environment.yml
 conda activate birpt
 ```
+## Datasets
+
+The dataset can be found in [this link](https://drive.google.com/drive/folders/1ZBGWHfbt0NRkGd_gzxAGaP3xj-chnQ4m?usp=sharing). It can be also found in [this link](https://library.ucsd.edu/dc/object/bb8474996f).
 
 ## Experiments
 
